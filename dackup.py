@@ -23,6 +23,8 @@ def backup(username, *, dry_run=False, journals=True, deviations=True, statuses=
         backup_deviations(api, username, dry_run)
     if journals:
         backup_journals(api, username, dry_run)
+    if statuses:
+        backup_statuses(api, username, dry_run)
 
 
 def backup_deviations(api, username, dry_run=False):
@@ -61,6 +63,20 @@ def backup_journals(api, username, dry_run=False):
             date = datetime.datetime.fromtimestamp(int(d.get('published_time'))).strftime('%Y-%m-%d_%H-%M-%S_')
             base_path = os.path.join(username, 'journals', date + url_filename(d.get('url')))
             api_save_deviation(api, d, base_path)
+
+
+def backup_statuses(api, username, dry_run=False):
+    print("Statuses")
+    statuses = api_suck_up_has_more(api, '/user/statuses/', {
+        'username': username,
+        'limit': 50,
+    })
+
+    if not statuses:
+        return
+
+    with open(os.path.join(username, 'statuses.json'), 'w') as fd:
+        json.dump(statuses, fd, sort_keys=True, indent=4)
 
 
 def makedir_if_needed(*args):
@@ -132,7 +148,8 @@ if __name__ == '__main__':
     parser.add_argument('username', help="DeviantArt username")
     parser.add_argument('--no-deviations', dest='deviations', action='store_false', help="don't save deviations")
     parser.add_argument('--no-journals', dest='journals', action='store_false', help="don't save journals")
-    parser.set_defaults(deviations=True, journals=True)
+    parser.add_argument('--no-statuses', dest='statuses', action='store_false', help="don't save statuses")
+    parser.set_defaults(deviations=True, journals=True, statuses=True)
     args, extra_args = parser.parse_known_args()
 
     backup(**vars(args))
