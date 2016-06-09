@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import datetime
 import json
 import os
@@ -86,6 +87,8 @@ def api_save_deviation(api, deviation, base_path):
         })
         if 'html' in content_data:
             with open(base_path + '.html', 'w') as fd:
+                # TODO: for *maximum* saving, this should arguably be saving
+                # the images in stylesheets and then rewriting the links
                 fd.write(text_deviation_template.format(
                     html=content_data.get('html', 'NO CONTENT'),
                     css=content_data.get('css', '')
@@ -118,11 +121,18 @@ def api_suck_up_has_more(api, endpoint, get={}, post={}, *args, **kw):
         }
         updated_get.update(get)
         fetched = api.request(endpoint, updated_get, post)
-        has_more = fetched['has_more']
-        offset = fetched['next_offset']
-        results.extend(fetched['results'])
+        has_more = fetched.get('has_more', False)
+        offset = fetched.get('next_offset')
+        results.extend(fetched.get('results', []))
     return results
 
 
 if __name__ == '__main__':
-    dackup('kemayo')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('username', help="DeviantArt username")
+    parser.add_argument('--no-deviations', dest='deviations', action='store_false', help="don't save deviations")
+    parser.add_argument('--no-journals', dest='journals', action='store_false', help="don't save journals")
+    parser.set_defaults(deviations=True, journals=True)
+    args, extra_args = parser.parse_known_args()
+
+    dackup(args.username, deviations=args.deviations, journals=args.journals)
