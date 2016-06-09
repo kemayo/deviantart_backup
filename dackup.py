@@ -16,16 +16,16 @@ import config
 text_deviation_template = '<html><head><style type="text/css">{css}</style></head><body>{html}</body></html>'
 
 
-def dackup(username, dry_run=False, journals=True, deviations=True):
+def backup(username, *, dry_run=False, journals=True, deviations=True, statuses=True):
     api = Api(config.CLIENT_ID, config.CLIENT_SECRET)
 
     if deviations:
-        dackup_deviations(api, username, dry_run)
+        backup_deviations(api, username, dry_run)
     if journals:
-        dackup_journals(api, username, dry_run)
+        backup_journals(api, username, dry_run)
 
 
-def dackup_deviations(api, username, dry_run):
+def backup_deviations(api, username, dry_run=False):
     print("Deviations")
     deviations = api_suck_up_has_more(api, '/gallery/all', {
         'username': username,
@@ -43,7 +43,7 @@ def dackup_deviations(api, username, dry_run):
             api_save_deviation(api, d, base_path)
 
 
-def dackup_journals(api, username, dry_run):
+def backup_journals(api, username, dry_run=False):
     print("Journals")
     journals = api_suck_up_has_more(api, '/browse/user/journals', {
         'username': username,
@@ -135,4 +135,4 @@ if __name__ == '__main__':
     parser.set_defaults(deviations=True, journals=True)
     args, extra_args = parser.parse_known_args()
 
-    dackup(args.username, deviations=args.deviations, journals=args.journals)
+    backup(**vars(args))
