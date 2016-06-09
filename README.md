@@ -1,4 +1,4 @@
-# dAckup
+# DeviantArt Backup
 
 A backup script for DeviantArt.
 
