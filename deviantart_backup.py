@@ -13,7 +13,7 @@ from api import Api
 import config
 
 
-text_deviation_template = '<html><head><style type="text/css">{css}</style></head><body>{html}</body></html>'
+text_deviation_template = '<html><head><style type="text/css">{css}</style>{webfonts}</head><body>{html}</body></html>'
 
 
 def backup(username, *, dry_run=False, journals=True, deviations=True, statuses=True):
@@ -105,9 +105,14 @@ def api_save_deviation(api, deviation, base_path):
             with open(base_path + '.html', 'w') as fd:
                 # TODO: for *maximum* saving, this should arguably be saving
                 # the images in stylesheets and then rewriting the links
+                webfonts = content_data.get('css_fonts', '')
+                if webfonts:
+                    webfonts = '<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family={}&v1" media="Screen,Projection,TV,Print">'.format('|'.join(webfonts))
+
                 fd.write(text_deviation_template.format(
                     html=content_data.get('html', 'NO CONTENT'),
-                    css=content_data.get('css', '')
+                    css=content_data.get('css', ''),
+                    webfonts=webfonts
                 ))
 
 
