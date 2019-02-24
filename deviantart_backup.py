@@ -154,7 +154,8 @@ if __name__ == '__main__':
     parser.add_argument('--no-deviations', dest='deviations', action='store_false', help="don't save deviations")
     parser.add_argument('--no-journals', dest='journals', action='store_false', help="don't save journals")
     parser.add_argument('--no-statuses', dest='statuses', action='store_false', help="don't save statuses")
-    parser.set_defaults(deviations=True, journals=True, statuses=True)
+    parser.add_argument('--dry-run', dest='dry_run', action='store_true', help="don't save anything")
+    parser.set_defaults(deviations=True, journals=True, statuses=True, dry_run=False)
     args, extra_args = parser.parse_known_args()
 
     backup(**vars(args))
