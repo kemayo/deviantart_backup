@@ -19,6 +19,7 @@ deviantart_backup.py [-h]
                      [--no-deviations]
                      [--no-journals]
                      [--no-statuses]
+                     [--dry-run]
                      username
 ```
 
